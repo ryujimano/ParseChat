@@ -12,6 +12,7 @@ import Parse
 class LoginViewController: UIViewController {
     @IBOutlet weak var emailField: UITextField!
     @IBOutlet weak var passwordField: UITextField!
+    @IBOutlet weak var userNameField: UITextField!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,15 +26,18 @@ class LoginViewController: UIViewController {
     }
     
     @IBAction func onSignUp(_ sender: Any) {
+        signUp()
     }
     @IBAction func onLogin(_ sender: Any) {
+        login()
     }
     
     
     func signUp() {
-        var user = PFUser()
+        let user = PFUser()
         user.password = passwordField.text
-        user.email = emailField.text
+        //user.email = emailField.text
+        user.username = userNameField.text
         
         user.signUpInBackground { (succeeded, error) in
             if let error = error as? NSError {
@@ -44,22 +48,26 @@ class LoginViewController: UIViewController {
                 alert.addAction(action)
                 self.show(alert, sender: nil)
             } else {
-                // Hooray! Let them use the app now.
+                self.authSuccessful()
             }
         }
     }
     
     func login() {
-        PFUser.logInWithUsername(inBackground: emailField.text ?? "", password: passwordField.text ?? "") { (user, error) in
+        PFUser.logInWithUsername(inBackground: userNameField.text ?? "", password: passwordField.text ?? "") { (user, error: Error?) in
             if user != nil {
-                // Do stuff after successful login.
+                self.authSuccessful()
             } else {
-                let alert = UIAlertController(title: "An Error Occurred", message: "An error occurred when attempting to log in. Please try again.", preferredStyle: .alert)
+                let alert = UIAlertController(title: "An Error Occurred", message: (error?.localizedDescription)! as? String, preferredStyle: .alert)
                 let action = UIAlertAction(title: "Ok", style: .default, handler: nil)
                 alert.addAction(action)
                 self.show(alert, sender: nil)
             }
         }
+    }
+    
+    func authSuccessful() {
+        performSegue(withIdentifier: "successSegue", sender: nil)
     }
     /*
     // MARK: - Navigation
