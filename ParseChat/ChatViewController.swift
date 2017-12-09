@@ -70,7 +70,7 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
     }
     
-    func onTimer() {
+    @objc func onTimer() {
         let query = PFQuery(className:"Message")
         query.order(byDescending: "createdAt")
         query.includeKey("user")
@@ -81,10 +81,10 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
                 // Do something with the found objects
                 if let objects = objects {
                     for object in objects {
-                        self.users.append((object["users"] as? String) ?? "")
-                        self.messages.append(object["text"] as! String)
-                        self.tableView.reloadData()
+                        self.users.append((object["user"] as? PFUser)?.username ?? "")
+                        self.messages.append((object["text"] as? String) ?? "")
                     }
+                    self.tableView.reloadData()
                 }
             } else {
                 // Log details of the failure
